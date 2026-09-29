@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rung Chuông Vàng - THPT Lê Duẩn</title>
+  <style>
+    :root {
+      --primary: #d32f2f;
+      --secondary: #fbc02d;
+      --bg: #1a0000;
+      --card-bg: #2b0000;
+      --text: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    /* Header Gameshow */
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { color: var(--secondary); font-size: 2.2rem; text-shadow: 0 0 10px rgba(251, 192, 45, 0.5); text-transform: uppercase; }
+    header h2 { font-size: 1.2rem; color: #ff8a80; }
+
+    /* Cards */
+    .container { width: 90%; max-width: 900px; background: var(--card-bg); border: 2px solid var(--secondary); border-radius: 15px; padding: 25px; box-shadow: 0 0 20px rgba(251, 192, 45, 0.2); }
+    .hidden { display: none !important; }
+
+    /* Login Form */
+    .login-box { text-align: center; }
+    .login-box input { padding: 12px; font-size: 1.1rem; border-radius: 8px; border: 1px solid var(--secondary); margin-bottom: 15px; width: 80%; max-width: 300px; text-align: center; }
+    .btn { padding: 12px 25px; font-size: 1.1rem; font-weight: bold; background: var(--secondary); color: #000; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn:hover { background: #fdd835; transform: scale(1.05); }
+
+    /* Timer */
+    .timer-container { display: flex; justify-content: center; align-items: center; margin: 15px 0; }
+    .timer-circle { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: 4px solid var(--secondary); display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; color: var(--secondary); animation: pulse 1s infinite alternate; }
+    @keyframes pulse { from { box-shadow: 0 0 5px var(--secondary); } to { box-shadow: 0 0 20px var(--secondary); } }
+
+    /* Question Screen */
+    .question-box { font-size: 1.3rem; margin-bottom: 20px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; min-height: 80px; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .option-btn { padding: 15px; font-size: 1.1rem; background: rgba(255,255,255,0.05); border: 2px solid #555; color: white; border-radius: 8px; cursor: pointer; text-align: left; transition: 0.2s; }
+    .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: rgba(251, 192, 45, 0.2); }
+    .option-btn.selected { background: var(--secondary); color: black; font-weight: bold; }
+
+    /* Status Screen */
+    .status-msg { text-align: center; font-size: 1.5rem; padding: 20px; color: var(--secondary); }
+    .eliminated { color: #ff5252; font-weight: bold; }
+
+    /* MC Dashboard Grid */
+    .mc-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-top: 15px; }
+    .student-node { padding: 8px 2px; text-align: center; font-size: 0.75rem; border-radius: 4px; background: #333; }
+    .student-node.active { background: #2e7d32; color: white; }
+    .student-node.out { background: #c62828; color: #ffcdd2; text-decoration: line-through; }
+
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .mc-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Rung Chuông Vàng</h1>
+    <h2>THPT Lê Duẩn - Tây Ninh</h2>
+  </header>
+
+  <div class="container">
+    <!-- 1. ĐĂNG NHẬP -->
+    <div id="screen-login" class="login-box">
+      <h3>ĐĂNG NHẬP DÀNH CHO THÍ SÍNH</h3>
+      <br>
+      <input type="text" id="input-maHS" placeholder="Nhập Mã Học Sinh (Ví dụ: HS001)" />
+      <br>
+      <button class="btn" onclick="login()">VÀO PHÒNG THI</button>
+      <br><br>
+      <a href="#" onclick="switchRole('mc')" style="color: #aaa; font-size: 0.9rem;">Chuyển sang giao diện MC / Quản trị</a>
+    </div>
+
+    <!-- 2. PHÒNG CHỜ THÍ SINH -->
+    <div id="screen-waiting" class="status-msg hidden">
+      <p>Chào mừng <span id="student-name" style="color:white;"></span>!</p>
+      <p>Bạn đã vào phòng chờ. Vui lòng đợi MC bắt đầu hội thi...</p>
+    </div>
+
+    <!-- 3. MÀN HÌNH CÂU HỎI (HỌC SINH) -->
+    <div id="screen-game" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="student-info" style="font-weight: bold;"></span>
+        <span id="game-round" style="color: var(--secondary); font-weight: bold;"></span>
+      </div>
+      
+      <div class="timer-container">
+        <div class="timer-circle" id="timer">10</div>
+      </div>
+
+      <div class="question-box" id="question-text">Đang tải câu hỏi...</div>
+
+      <div class="options-grid">
+        <button class="option-btn" id="opt-A" onclick="selectAnswer('A')">A. </button>
+        <button class="option-btn" id="opt-B" onclick="selectAnswer('B')">B. </button>
+        <button class="option-btn" id="opt-C" onclick="selectAnswer('C')">C. </button>
+        <button class="option-btn" id="opt-D" onclick="selectAnswer('D')">D. </button>
+      </div>
+    </div>
+
+    <!-- 4. THÔNG BÁO BỊ LOẠI -->
+    <div id="screen-eliminated" class="status-msg hidden">
+      <p class="eliminated">RẤT TIẾC! BẠN ĐÃ BỊ LOẠI KHỎI SÀN ĐẤU.</p>
+      <p style="font-size: 1rem; color: #ccc; margin-top: 10px;">Hãy tiếp tục theo dõi các thí sinh còn lại cổ vũ hội thi!</p>
+    </div>
+
+    <!-- 5. MC DASHBOARD -->
+    <div id="screen-mc" class="hidden">
+      <h3 style="text-align: center; color: var(--secondary);">BẢNG ĐIỀU KHIỂN MC / QUẢN TRỊ</h3>
+      <br>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn" onclick="sendMcCmd('setGameStatus', 'PHONG_CHO')">Mở Phòng Cho</button>
+        <button class="btn" onclick="sendMcCmd('setGameStatus', 'VONG_1')">Bắt Đầu Vòng 1</button>
+        <button class="btn" onclick="sendMcCmd('setGameStatus', 'CHUNG_KET')">Bắt Đầu Chung Kết</button>
+        <button class="btn" onclick="sendMcCmd('nextQuestion', '')">Qua Câu Tiếp Theo</button>
+        <button class="btn" style="background:#c62828; color:white;" onclick="sendMcCmd('setGameStatus', 'KET_THUC')">Kết Thúc</button>
+      </div>
+
+      <hr style="margin: 20px 0; border-color: #555;">
+
+      <div id="mc-question-info" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+        <p><strong>Câu hỏi hiện tại:</strong> <span id="mc-q-text">Chưa bắt đầu</span></p>
+        <p style="color: #4caf50; font-weight: bold; margin-top: 5px;">Đáp án đúng: <span id="mc-q-ans">--</span></p>
+      </div>
+
+      <h4 style="margin-top: 15px;">Thống kê 100 thí sinh (<span id="mc-active-count" style="color: #4caf50;">0</span>/100 còn lại):</h4>
+      <div class="mc-grid" id="mc-student-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    // CẤU HÌNH WEB APP URL TỪ GOOGLE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbxqua5jHzPLiLduqP_1vqbJM1KBpzj8KWPZGkb1qnFoPgWL-9iX9zDyUSNIQiLd5U0pBw/exec";
+
+    let currentStudent = null;
+    let selectedAns = null;
+    let currentQId = null;
+    let pollInterval = null;
+    let timerInterval = null;
+    let isMC = false;
+
+    // Chống gian lận: Phát hiện học sinh chuyển Tab/Thoát màn hình
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden && currentStudent && !isMC) {
+        alert("CẢNH BÁO: Bạn đã rời màn hình thi! Hệ thống đã ghi nhận.");
+      }
+    });
+
+    function switchRole(role) {
+      if (role === 'mc') {
+        isMC = true;
+        showScreen('screen-mc');
+        startPolling();
+      }
+    }
+
+    async function login() {
+      const maHS = document.getElementById("input-maHS").value.trim();
+      if (!maHS) return alert("Vui lòng nhập Mã học sinh!");
+
+      const res = await fetch(`${API_URL}?action=login&maHS=${maHS}`).then(r => r.json());
+      if (res.status === "success") {
+        currentStudent = res.student;
+        document.getElementById("student-name").innerText = `${currentStudent.ten} (${currentStudent.lop})`;
+        document.getElementById("student-info").innerText = `${currentStudent.ten} - ${currentStudent.maHS}`;
+        showScreen('screen-waiting');
+        startPolling();
+      } else {
+        alert(res.message);
+      }
+    }
+
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(fetchGameState, 1500); // Check state mỗi 1.5 giây
+    }
+
+    async function fetchGameState() {
+      if (isMC) {
+        const data = await fetch(`${API_URL}?action=getMcDashboard`).then(r => r.json());
+        if (data.status === "success") updateMcView(data);
+        return;
+      }
+
+      const maHS = currentStudent ? currentStudent.maHS : "";
+      const data = await fetch(`${API_URL}?action=getGameState&maHS=${maHS}`).then(r => r.json());
+
+      if (data.status === "success") {
+        if (data.studentStatus === "DA_LOAI") {
+          showScreen('screen-eliminated');
+          return;
+        }
+
+        if (data.gameStatus === "PHONG_CHO") {
+          showScreen('screen-waiting');
+        } else if (data.gameStatus === "VONG_1" || data.gameStatus === "CHUNG_KET") {
+          showScreen('screen-game');
+          document.getElementById("game-round").innerText = data.gameStatus === "VONG_1" ? "VÒNG 1" : "VÒNG CHUNG KẾT";
+          updateQuestion(data);
+        } else if (data.gameStatus === "KET_THUC") {
+          alert("Hội thi đã kết thúc!");
+        }
+      }
+    }
+
+    function updateQuestion(data) {
+      if (!data.question) return;
+
+      if (currentQId !== data.question.id) {
+        // Đổi câu hỏi mới -> Reset timer và lựa chọn
+        currentQId = data.question.id;
+        selectedAns = null;
+        resetOptionStyles();
+
+        document.getElementById("question-text").innerText = `Câu ${data.question.id}: ${data.question.noiDung}`;
+        document.getElementById("opt-A").innerText = data.question.a;
+        document.getElementById("opt-B").innerText = data.question.b;
+        document.getElementById("opt-C").innerText = data.question.c;
+        document.getElementById("opt-D").innerText = data.question.d;
+
+        startTimer(data.startTime, data.serverTime);
+      }
+    }
+
+    function startTimer(startTimeMs, serverTimeMs) {
+      if (timerInterval) clearInterval(timerInterval);
+      
+      const duration = 10; // 10 giây
+      
+      timerInterval = setInterval(() => {
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTimeMs) / 1000);
+        const remaining = duration - elapsed;
+
+        if (remaining >= 0) {
+          document.getElementById("timer").innerText = remaining;
+        } else {
+          document.getElementById("timer").innerText = "0";
+          clearInterval(timerInterval);
+          disableOptions(); // Hết giờ khóa chọn
+        }
+      }, 500);
+    }
+
+    async function selectAnswer(ans) {
+      if (selectedAns) return; // Chỉ được chọn 1 lần
+      selectedAns = ans;
+
+      // Highlight nút chọn
+      document.getElementById(`opt-${ans}`).classList.add("selected");
+      disableOptions();
+
+      // Nộp đáp án lên Server
+      await fetch(`${API_URL}?action=submitAnswer&maHS=${currentStudent.maHS}&questionId=${currentQId}&answer=${ans}`);
+    }
+
+    function resetOptionStyles() {
+      ['A', 'B', 'C', 'D'].forEach(opt => {
+        const btn = document.getElementById(`opt-${opt}`);
+        btn.classList.remove("selected");
+        btn.disabled = false;
+      });
+    }
+
+    function disableOptions() {
+      ['A', 'B', 'C', 'D'].forEach(opt => {
+        document.getElementById(`opt-${opt}`).disabled = true;
+      });
+    }
+
+    // Các hàm MC Control
+    async function sendMcCmd(cmd, param) {
+      await fetch(`${API_URL}?action=mcAction&cmd=${cmd}&param=${param}`);
+      fetchGameState();
+    }
+
+    function updateMcView(data) {
+      if (data.currentQuestion) {
+        document.getElementById("mc-q-text").innerText = `Câu ${data.currentQuestion.id}: ${data.currentQuestion.noiDung}`;
+        document.getElementById("mc-q-ans").innerText = data.currentQuestion.dapAnDung;
+      }
+
+      const grid = document.getElementById("mc-student-grid");
+      grid.innerHTML = "";
+      let activeCount = 0;
+
+      data.students.forEach(s => {
+        const div = document.createElement("div");
+        const isActive = s.trangThai === "DANG_THI";
+        if (isActive) activeCount++;
+
+        div.className = `student-node ${isActive ? 'active' : 'out'}`;
+        div.innerText = s.maHS;
+        div.title = `${s.ten} - ${s.lop} (${s.diem} điểm)`;
+        grid.appendChild(div);
+      });
+
+      document.getElementById("mc-active-count").innerText = activeCount;
+    }
+
+    function showScreen(screenId) {
+      ['screen-login', 'screen-waiting', 'screen-game', 'screen-eliminated', 'screen-mc'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
