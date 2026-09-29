@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Trị Hệ Thống - Rung Chuông Vàng Lê Duẩn</title>
+  <style>
+    :root {
+      --primary: #8e0000;
+      --secondary: #fbc02d;
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #ffffff;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #ef6c00;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; }
+
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--secondary); padding-bottom: 15px; margin-bottom: 20px; }
+    header h1 { color: var(--secondary); font-size: 1.8rem; }
+
+    .grid-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+    .card { background: var(--card-bg); border-radius: 10px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
+    .card h3 { color: var(--secondary); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; }
+
+    /* Controls */
+    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
+    .btn { padding: 10px 15px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; text-align: center; }
+    .btn-primary { background: var(--secondary); color: #000; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* Stats */
+    .stat-box { display: flex; gap: 15px; margin-bottom: 15px; }
+    .stat-item { flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; }
+    .stat-item .num { font-size: 1.8rem; font-weight: bold; color: var(--secondary); }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; font-size: 0.9rem; }
+    th { background: rgba(255,255,255,0.05); color: var(--secondary); }
+
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+    .badge-waiting { background: var(--warning); color: white; }
+    .badge-active { background: var(--success); color: white; }
+    .badge-out { background: var(--danger); color: white; }
+
+    /* Grid thí sinh */
+    .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+    .student-box { padding: 8px 4px; border-radius: 6px; text-align: center; font-size: 0.8rem; border: 1px solid #444; }
+    .student-box.CHO_DUYET { background: #5d4037; color: #ffcc80; border-color: var(--warning); }
+    .student-box.DANG_THI { background: #1b5e20; color: #a5d6a7; border-color: var(--success); }
+    .student-box.DA_LOAI { background: #b71c1c; color: #ef9a9a; text-decoration: line-through; opacity: 0.6; }
+
+    @media (max-width: 900px) {
+      .grid-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>TRANG QUẢN TRỊ GAMESHOW</h1>
+    <div>
+      <span>Trạng thái: <strong id="game-status-text" style="color: var(--secondary);">ĐANG TẢI...</strong></span>
+    </div>
+  </header>
+
+  <div class="grid-container">
+    <!-- CỘT TRÁI: ĐIỀU KHIỂN VÀ CÂU HỎI -->
+    <div>
+      <!-- LỆNH ĐIỀU KHIỂN -->
+      <div class="card">
+        <h3>ĐIỀU KHIỂN TIẾN TRÌNH THI</h3>
+        <div class="controls-grid">
+          <button class="btn btn-warning" onclick="sendMcCmd('setGameStatus', 'PHONG_CHO')">Mở Phòng Cho</button>
+          <button class="btn btn-success" onclick="sendMcCmd('setGameStatus', 'VONG_1')">Bắt Đầu Vòng 1</button>
+          <button class="btn btn-success" onclick="sendMcCmd('setGameStatus', 'CHUNG_KET')">Bắt Đầu Chung Kết</button>
+          <button class="btn btn-primary" onclick="sendMcCmd('nextQuestion', '')">Qua Câu Tiếp Theo ➔</button>
+          <button class="btn btn-danger" onclick="sendMcCmd('setGameStatus', 'KET_THUC')">Kết Thúc Game</button>
+        </div>
+      </div>
+
+      <!-- CÂU HỎI HIỆN TẠI -->
+      <div class="card">
+        <h3>CÂU HỎI HIỆN TẠI (MC OBSERVER)</h3>
+        <div id="q-info">
+          <p style="font-size: 1.1rem; margin-bottom: 10px;"><strong id="q-title">Đang chờ câu hỏi...</strong></p>
+          <p id="q-content" style="color: #ccc; margin-bottom: 15px;"></p>
+          <div style="background: rgba(46, 125, 50, 0.2); border: 1px solid var(--success); padding: 10px; border-radius: 6px;">
+            <span>Đáp án chính xác: <strong id="q-answer" style="color: #81c784; font-size: 1.2rem;">--</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANH SÁCH THÍ SINH CẦN DUYỆT -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; border: none; padding: 0;">DUYỆT THÍ SINH VÀO PHÒNG</h3>
+          <button class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem;" onclick="approveAll()">Duyệt Tất Cả</button>
+        </div>
+        <div style="max-height: 250px; overflow-y: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã HS</th>
+                <th>Họ Và Tên</th>
+                <th>Lớp</th>
+                <th>Trạng Thái</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="table-approval">
+              <!-- Render danh sách chờ duyệt -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CỘT PHẢI: THỐNG KÊ VÀ BẢN ĐỒ THÍ SINH -->
+    <div>
+      <!-- THỐNG KÊ -->
+      <div class="card">
+        <h3>THỐNG KÊ HIỆN TẠI</h3>
+        <div class="stat-box">
+          <div class="stat-item">
+            <div class="num" id="stat-total">0</div>
+            <div style="font-size: 0.8rem; color: #aaa;">Tổng TS</div>
+          </div>
+          <div class="stat-item">
+            <div class="num" id="stat-active" style="color: #81c784;">0</div>
+            <div style="font-size: 0.8rem; color: #aaa;">Đang thi</div>
+          </div>
+          <div class="stat-item">
+            <div class="num" id="stat-out" style="color: #e57373;">0</div>
+            <div style="font-size: 0.8rem; color: #aaa;">Đã loại</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sơ đồ 100 THÍ SINH -->
+      <div class="card">
+        <h3>SƠ ĐỒ SÀN THI (100 THÍ SINH)</h3>
+        <div class="student-grid" id="student-grid">
+          <!-- Render 100 thí sinh -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // THAY THẾ URL WEB APP GOOGLE APPS SCRIPT CỦA BẠN VÀO ĐÂY
+    const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    let pollInterval = null;
+
+    window.onload = function() {
+      fetchDashboardData();
+      pollInterval = setInterval(fetchDashboardData, 2000); // Tự động cập nhật mỗi 2 giây
+    };
+
+    async function fetchDashboardData() {
+      try {
+        const res = await fetch(`${API_URL}?action=getMcDashboard`).then(r => r.json());
+        if (res.status === "success") {
+          updateUI(res);
+        }
+      } catch (e) {
+        console.error("Lỗi lấy dữ liệu:", e);
+      }
+    }
+
+    function updateUI(data) {
+      // 1. Cập nhật trạng thái Game
+      document.getElementById("game-status-text").innerText = data.state.GameStatus || "N/A";
+
+      // 2. Cập nhật câu hỏi
+      if (data.currentQuestion) {
+        document.getElementById("q-title").innerText = `Câu ${data.currentQuestion.id} (Vòng ${data.currentQuestion.vong})`;
+        document.getElementById("q-content").innerText = data.currentQuestion.noiDung;
+        document.getElementById("q-answer").innerText = `${data.currentQuestion.dapAnDung}`;
+      } else {
+        document.getElementById("q-title").innerText = "Chưa bắt đầu câu hỏi";
+        document.getElementById("q-content").innerText = "";
+        document.getElementById("q-answer").innerText = "--";
+      }
+
+      // 3. Cập nhật Thống kê
+      const students = data.students || [];
+      let active = 0, out = 0, waiting = 0;
+
+      students.forEach(s => {
+        if (s.trangThai === "DANG_THI") active++;
+        else if (s.trangThai === "DA_LOAI") out++;
+        else if (s.trangThai === "CHO_DUYET") waiting++;
+      });
+
+      document.getElementById("stat-total").innerText = students.length;
+      document.getElementById("stat-active").innerText = active;
+      document.getElementById("stat-out").innerText = out;
+
+      // 4. Render Bảng chờ duyệt
+      const approvalTbody = document.getElementById("table-approval");
+      approvalTbody.innerHTML = "";
+
+      const pendingStudents = students.filter(s => s.trangThai === "CHO_DUYET" || s.trangThai === "CHUA_DUYET");
+      if (pendingStudents.length === 0) {
+        approvalTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Không có thí sinh chờ duyệt</td></tr>`;
+      } else {
+        pendingStudents.forEach(s => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${s.maHS}</strong></td>
+            <td>${s.ten}</td>
+            <td>${s.lop}</td>
+            <td><span class="badge badge-waiting">Chờ duyệt</span></td>
+            <td>
+              <button class="btn btn-success" style="padding: 3px 8px; font-size:0.75rem;" onclick="approveStudent('${s.maHS}', 'DANG_THI')">Duyệt</button>
+            </td>
+          `;
+          approvalTbody.appendChild(tr);
+        });
+      }
+
+      // 5. Render Sơ đồ sàn thi
+      const grid = document.getElementById("student-grid");
+      grid.innerHTML = "";
+      students.forEach(s => {
+        const div = document.createElement("div");
+        const statusClass = s.trangThai || 'CHO_DUYET';
+        div.className = `student-box ${statusClass}`;
+        div.innerText = s.maHS;
+        div.title = `${s.ten} (${s.lop}) - Điểm: ${s.diem}`;
+        grid.appendChild(div);
+      });
+    }
+
+    async function sendMcCmd(cmd, param) {
+      await fetch(`${API_URL}?action=mcAction&cmd=${cmd}&param=${param}`);
+      fetchDashboardData();
+    }
+
+    async function approveStudent(maHS, status) {
+      await fetch(`${API_URL}?action=approveStudent&maHS=${maHS}&status=${status}`);
+      fetchDashboardData();
+    }
+
+    async function approveAll() {
+      await fetch(`${API_URL}?action=approveAllStudents`);
+      fetchDashboardData();
+    }
+  </script>
+</body>
+</html>
