@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07102c"><title>Rung Chuông Vàng | THPT Lê Duẩn</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="bg-orb orb1"></div><div class="bg-orb orb2"></div>
+<header class="site-head"><div class="brand-mark">🔔</div><div><b>RUNG CHUÔNG VÀNG</b><small>TRƯỜNG THPT LÊ DUẨN · TÂY NINH</small></div><span id="netState" class="net">● Đang kết nối</span></header>
+<main>
+<section id="loginView" class="screen active"><div class="login-card glass">
+<div class="eyebrow">SÂN CHƠI TRI THỨC</div><h1>RUNG CHUÔNG<br><em>VÀNG</em></h1><p>Chinh phục tri thức · Tỏa sáng bản lĩnh</p>
+<label>Họ và tên<input id="fullName" maxlength="100" autocomplete="name" placeholder="Nhập họ và tên"></label>
+<label>Lớp<input id="className" maxlength="30" placeholder="Ví dụ: 10A1"></label>
+<button id="joinBtn" class="btn primary">THAM GIA CUỘC THI <span>→</span></button><div id="loginMsg" class="message"></div>
+<div class="login-note">Mỗi học sinh chỉ sử dụng một thiết bị trong suốt lượt thi.</div></div></section>
+<section id="examView" class="screen"><div class="player-bar glass"><div><b id="playerName">Thí sinh</b><small id="playerClass">Lớp</small></div><div class="round">CÂU <b id="qNumber">--</b><small id="qTotal">/ 20</small></div><div id="timer" class="timer">10</div></div>
+<div id="waiting" class="question-card glass"><div class="live-dot"></div><h2>ĐÃ VÀO SÂN THI</h2><p>Hãy tập trung và chờ hiệu lệnh từ MC.</p><div id="waitingInfo" class="muted"></div></div>
+<div id="questionArea" class="question-card glass hidden"><div class="question-label">THỬ THÁCH TRI THỨC</div><h2 id="questionText">Câu hỏi sẽ xuất hiện tại đây</h2><div id="options" class="options">
+<button data-choice="A"><b>A</b><span></span></button><button data-choice="B"><b>B</b><span></span></button><button data-choice="C"><b>C</b><span></span></button><button data-choice="D"><b>D</b><span></span></button></div><div id="answerNotice" class="answer-notice">Chọn đáp án trước khi đồng hồ về 0</div></div>
+<div id="eliminated" class="question-card glass hidden"><div class="big-icon">⚡</div><h2>BẠN ĐÃ DỪNG CUỘC CHƠI</h2><p id="eliminatedReason"></p><p>Hãy tiếp tục cổ vũ các thí sinh còn lại!</p></div>
+<div id="finished" class="question-card glass hidden"><div class="big-icon">🏆</div><h2>CUỘC THI ĐÃ KẾT THÚC</h2><p id="finalMessage"></p></div>
+</section>
+</main><div id="toast" role="status"></div>
+<script src="config.js"></script><script src="app.js"></script></body></html>
