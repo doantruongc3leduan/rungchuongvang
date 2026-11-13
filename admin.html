@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Pro | Rung Chuông Vàng</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+  <header class="admin-top">
+    <a class="brand" href="index.html">
+      <span class="brand-logo">🔔</span>
+      <span><b>RUNG CHUÔNG VÀNG <span class="pro-tag">PRO</span></b><small>THPT LÊ DUẨN · TRUNG TÂM ĐIỀU HÀNH</small></span>
+    </a>
+    <div class="top-right">
+      <a href="screen.html" target="_blank" class="action-btn outline-btn sm-btn" style="text-decoration:none">📺 MÀN HÌNH CHIẾU</a>
+      <a href="results.html" target="_blank" class="action-btn outline-btn sm-btn" style="text-decoration:none">🏆 XẾP HẠNG</a>
+      <span id="connection" style="font-size:13px;font-weight:700;color:#64748b">● Chưa kết nối</span>
+      <button id="logoutAdmin" class="action-btn outline-btn sm-btn hidden">Đăng xuất</button>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <section id="loginPanel" class="login-panel surface">
+      <div class="login-emblem">🛡️</div>
+      <p class="kicker">QUẢN TRỊ HỆ THỐNG PRO</p>
+      <h1>Trung tâm điều khiển</h1>
+      <p class="sub">Đăng nhập để giám sát, quản lý ngân hàng câu hỏi và điều hành cuộc thi trực tiếp.</p>
+      <div class="login-grid">
+        <label>Tài khoản<input id="adminUser" autocomplete="username" placeholder="Nhập admin" value="admin"></label>
+        <label>Mật khẩu<input id="adminPass" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị"></label>
+        <button class="action-btn primary-btn wide" id="loginAdmin">ĐĂNG NHẬP HỆ THỐNG →</button>
+      </div>
+      <div id="adminMsg" class="notice" role="status"></div>
+    </section>
+
+    <div id="controls" class="hidden">
+      <section class="welcome-row">
+        <div>
+          <p class="kicker">LIVE CONTROL ROOM PRO</p>
+          <h1>Bảng điều hành cuộc thi</h1>
+          <p class="sub" style="margin-bottom:0">Duyệt thí sinh đồng loạt, cứu trợ, quản lý ngân hàng câu hỏi và theo dõi thời gian thực.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="btnOpenQBank" class="action-btn outline-btn">📚 NGÂN HÀNG CÂU HỎI</button>
+          <button id="btnExportCsv" class="action-btn outline-btn">📥 XUẤT CSV</button>
+          <span id="statusBadge" class="badge badge-amber" style="font-size:13px;padding:8px 14px">ĐANG CHỜ</span>
+        </div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="metric-card"><span class="metric-icon blue">👥</span><div><small>TỔNG ĐĂNG KÝ</small><strong id="mTotal">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon green">✓</span><div><small>ĐANG THI / ĐÃ DUYỆT</small><strong id="mActive">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon amber">⌛</span><div><small>CHỜ DUYỆT</small><strong id="mPending">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon red">✕</span><div><small>ĐÃ BỊ LOẠI</small><strong id="mEliminated">0</strong></div></article>
+      </section>
+
+      <section class="control-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div><p class="kicker">GAME MASTER</p><h2>Điều khiển cuộc thi</h2></div>
+            <span id="adminTimer" style="font-size:22px;font-weight:900;color:var(--primary)">0s</span>
+          </div>
+          <div class="main-actions">
+            <button id="start" class="action-btn primary-btn">▶ BẮT ĐẦU THI</button>
+            <button id="next" class="action-btn soft-btn">⏭ CÂU TIẾP THEO</button>
+            <button id="pause" class="action-btn soft-btn">Ⅱ TẠM DỪNG</button>
+            <button id="resume" class="action-btn soft-btn">▶ TIẾP TỤC</button>
+            <button id="finish" class="action-btn danger-btn">■ KẾT THÚC</button>
+            <button id="resetGame" class="action-btn outline-btn" style="border-color:#fca5a5;color:#dc2626">↺ TẠO PHIÊN MỚI</button>
+          </div>
+          <div id="liveQuestionBox" style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--border)">
+            <small class="kicker" id="liveQMeta">CHƯA BẮT ĐẦU</small>
+            <p id="liveQText" style="font-weight:700;margin-top:4px">Bấm "Bắt đầu thi" để phát câu hỏi đầu tiên.</p>
+            <p id="liveQAns" style="font-size:13px;color:var(--success);font-weight:700;margin-top:6px"></p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div><p class="kicker">CẤU HÌNH & THAO TÁC NHANH</p><h2>Thiết lập phiên thi</h2></div>
+          </div>
+          <div class="main-actions">
+            <button id="approveAll" class="action-btn success-btn">✓ DUYỆT TẤT CẢ THÍ SINH</button>
+            <button id="reinstateAll" class="action-btn soft-btn">💖 CỨU TRỢ TẤT CẢ</button>
+          </div>
+          <div class="settings-row">
+            <label>Số câu thi<input id="cfgQuestions" type="number" min="1" max="100" value="20"></label>
+            <label>Giây / câu<input id="cfgSeconds" type="number" min="5" max="120" value="10"></label>
+            <label>Kho bốc thăm<input id="cfgPool" type="number" min="1" max="500" value="100"></label>
+          </div>
+          <button id="saveSettings" class="action-btn outline-btn wide" style="margin-top:12px">💾 LƯU CẤU HÌNH</button>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div><p class="kicker">DANH SÁCH SÀN ĐẤU</p><h2>Thí sinh tham gia</h2></div>
+          <input id="searchStudent" placeholder="Tìm tên hoặc lớp..." style="max-width:260px;margin:0">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Mã TS</th><th>Họ và tên</th><th>Lớp</th><th>Trạng thái</th><th>Ghi chú / Lý do</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody id="studentRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal Ngân hàng câu hỏi -->
+  <div id="qBankModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="panel-head">
+        <div><p class="kicker">NGÂN HÀNG CÂU HỎI PRO</p><h2>Quản lý câu hỏi trực tiếp</h2></div>
+        <button id="btnCloseQBank" class="action-btn outline-btn sm-btn">✕ Đóng</button>
+      </div>
+      <div style="background:#f8fafc;padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:18px">
+        <input type="hidden" id="qEditId">
+        <div class="form-grid">
+          <label>Nội dung câu hỏi<textarea id="qInputText" rows="2" placeholder="Nhập nội dung câu hỏi..."></textarea></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label>Đáp án A<input id="qInputA" placeholder="Phương án A"></label>
+            <label>Đáp án B<input id="qInputB" placeholder="Phương án B"></label>
+            <label>Đáp án C<input id="qInputC" placeholder="Phương án C"></label>
+            <label>Đáp án D<input id="qInputD" placeholder="Phương án D"></label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <label>Đáp án đúng
+              <select id="qInputCorrect"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+            </label>
+            <label>Chủ đề<input id="qInputTopic" value="Kiến thức chung"></label>
+            <label>Trạng thái
+              <select id="qInputActive"><option value="TRUE">Hiển thị (Bật)</option><option value="FALSE">Ẩn (Tắt)</option></select>
+            </label>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button id="btnSaveQuestion" class="action-btn primary-btn">💾 LƯU CÂU HỎI</button>
+            <button id="btnResetQuestionForm" class="action-btn outline-btn">Làm mới ô nhập</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Nội dung câu hỏi</th><th>Đáp án</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+          <tbody id="qBankRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bảng Xếp Hạng | Rung Chuông Vàng Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-logo">🏆</span>
+      <span><b>BẢNG XẾP HẠNG VINH DANH <span class="pro-tag">PRO</span></b><small>RUNG CHUÔNG VÀNG · THPT LÊ DUẨN</small></span>
+    </a>
+    <div class="top-right">
+      <button onclick="location.reload()" class="action-btn outline-btn sm-btn">↻ Làm mới</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width:960px">
+    <section class="surface">
+      <p class="kicker">KẾT QUẢ CHUNG CUỘC</p>
+      <h1 style="margin-bottom:18px">Bảng vàng thành tích thí sinh</h1>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Hạng</th><th>Họ và tên</th><th>Lớp</th><th>Số câu đúng</th><th>Câu dừng</th><th>Trạng thái</th></tr>
+          </thead>
+          <tbody id="rankRows"><tr><td colspan="6">Đang tải dữ liệu...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script>
+    (async () => {
+      const url = RCV_CONFIG.API_URL + "?action=leaderboard";
+      let d;
+      try {
+        const r = await fetch(url);
+        d = await r.json();
+      } catch (_) {
+        d = await new Promise(res => {
+          const cb = "rcv_lb_" + Date.now();
+          const s = document.createElement("script");
+          window[cb] = x => { delete window[cb]; s.remove(); res(x); };
+          s.src = url + "&callback=" + cb;
+          document.body.appendChild(s);
+        });
+      }
+      const tbody = document.getElementById("rankRows");
+      if (!d || !d.ok || !d.rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6">Chưa có dữ liệu xếp hạng.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = d.rows.map((r, idx) => {
+        const medal = idx === 0 ? "🥇 1" : (idx === 1 ? "🥈 2" : (idx === 2 ? "🥉 3" : idx + 1));
+        return `<tr>
+          <td><b>${medal}</b></td>
+          <td><b>${r.hoTen}</b></td>
+          <td>${r.lop}</td>
+          <td><span class="badge badge-green">${r.correct} câu</span></td>
+          <td>Câu ${r.lastQuestion || 0}</td>
+          <td>${r.status} ${r.reason ? `(${r.reason})` : ""}</td>
+        </tr>`;
+      }).join("");
+    })();
+  </script>
+</body>
+</html>

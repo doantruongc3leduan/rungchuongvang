@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Rung Chuông Vàng - THPT Lê Duẩn</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-logo">🔔</span>
+      <span><b>ĐẤU TRƯỜNG TRI THỨC <span class="pro-tag">LD</span></b><small>ĐOÀN TRƯỜNG THPT LÊ DUẨN - TÂY NINH</small></span>
+    </a>
+    <div class="top-right">
+      <span id="netState" style="font-size:13px;font-weight:700;color:#059669">● Sẵn sàng</span>
+      <button id="soundToggle" class="action-btn outline-btn sm-btn">🔊 Âm thanh: Bật</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="loginView" class="login-panel">
+      <div class="login-emblem">🎓</div>
+      <p class="kicker">CỔNG ĐĂNG KÝ THÍ SINH</p>
+      <h1>Tham gia sàn đấu</h1>
+      <p class="sub">Nhập đầy đủ Họ tên và Lớp để vào chương trình</p>
+      <div class="login-grid">
+        <label>Họ và tên thí sinh<input id="fullName" placeholder="Ví dụ: Nguyễn Văn An" autocomplete="name"></label>
+        <label>Lớp<input id="className" placeholder="Ví dụ: 11A1"></label>
+        <button id="joinBtn" class="action-btn primary-btn wide">VÀO PHÒNG THI →</button>
+      </div>
+      <div id="loginMsg" class="notice"></div>
+    </section>
+
+    <section id="examView" class="surface hidden">
+      <div class="status-bar">
+        <div>
+          <strong id="playerName" style="font-size:16px">Thí sinh</strong> · <span id="playerClass" class="badge badge-blue">Lớp</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-green">Điểm: <b id="playerScore">0</b></span>
+          <span id="playerStateBadge" class="badge badge-amber">Đang chờ</span>
+        </div>
+      </div>
+
+      <div id="waitingBox" style="text-align:center;padding:36px 12px">
+        <div style="font-size:48px;margin-bottom:10px">⏳</div>
+        <h2 id="waitTitle">Đang chờ Ban tổ chức bắt đầu...</h2>
+        <p id="waitDesc" class="sub" style="margin-top:6px">Vui lòng giữ nguyên màn hình này và không chuyển sang ứng dụng khác.</p>
+      </div>
+
+      <div id="eliminatedBox" class="hidden" style="text-align:center;padding:36px 12px">
+        <div style="font-size:52px;margin-bottom:10px">🛑</div>
+        <h2 style="color:var(--danger)">BẠN ĐÃ DỪNG CUỘC CHƠI</h2>
+        <p id="elimReason" class="sub" style="margin-top:8px;font-weight:700;color:#991b1b">Lý do: Trả lời sai</p>
+        <p class="sub">Hãy theo dõi sân khấu để chờ lượt <b>Cứu trợ</b> từ Thầy Cô và khán giả!</p>
+      </div>
+
+      <div id="finishedBox" class="hidden" style="text-align:center;padding:36px 12px">
+        <div style="font-size:52px;margin-bottom:10px">🏆</div>
+        <h2>CUỘC THI ĐÃ KẾT THÚC</h2>
+        <p class="sub" style="margin-top:8px">Cảm ơn bạn đã tham gia Rung Chuông Vàng Pro!</p>
+        <a href="results.html" class="action-btn primary-btn" style="text-decoration:none;margin-top:10px">XEM BẢNG XẾP HẠNG</a>
+      </div>
+
+      <div id="questionBox" class="hidden">
+        <div class="timer-box">
+          <span class="badge badge-blue" id="qCounter">Câu 1 / 20</span>
+          <span class="timer-num" id="timerDisplay">10s</span>
+        </div>
+        <div class="q-text" id="qText">Đang tải nội dung câu hỏi...</div>
+        <div class="options-grid" id="options">
+          <button class="opt-btn" data-choice="A"><span class="opt-key">A</span><span id="optA"></span></button>
+          <button class="opt-btn" data-choice="B"><span class="opt-key">B</span><span id="optB"></span></button>
+          <button class="opt-btn" data-choice="C"><span class="opt-key">C</span><span id="optC"></span></button>
+          <button class="opt-btn" data-choice="D"><span class="opt-key">D</span><span id="optD"></span></button>
+        </div>
+        <div id="answerNotice" class="notice ok" style="text-align:center"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

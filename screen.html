@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Màn Hình Sân Khấu | Rung Chuông Vàng Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="screen-body">
+  <div class="stage-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="text-align:left">
+        <span class="pro-tag">LIVE STAGE PRO</span>
+        <h2 style="font-size:24px;margin-top:4px">🔔 RUNG CHUÔNG VÀNG · THPT LÊ DUẨN</h2>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div class="badge badge-green" style="font-size:15px;padding:8px 16px">Trên sàn: <b id="stActive">0</b></div>
+        <div class="badge badge-red" style="font-size:15px;padding:8px 16px">Bị loại: <b id="stElim">0</b></div>
+        <button id="stageSound" class="action-btn outline-btn sm-btn">🔊 Âm thanh: Bật</button>
+      </div>
+    </div>
+
+    <div class="stage-card">
+      <div id="stageWaiting">
+        <div style="font-size:64px;margin-bottom:12px">🔔</div>
+        <h1 style="font-size:38px">CHÀO MỪNG CÁC THÍ SINH ĐẾN VỚI SÀN ĐẤU</h1>
+        <p style="font-size:20px;opacity:0.85;margin-top:10px">Đã đăng ký: <b id="stTotal">0</b> thí sinh · Sẵn sàng tranh tài!</p>
+      </div>
+
+      <div id="stageQuestion" class="hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="badge badge-amber" style="font-size:18px;padding:8px 18px" id="stQNo">CÂU 1 / 20</span>
+          <span style="font-size:18px;opacity:0.9" id="stAnswered">Đã trả lời: 0</span>
+          <div style="font-size:46px;font-weight:900;color:#fbbf24" id="stTimer">10s</div>
+        </div>
+        <div class="stage-q" id="stQText">Nội dung câu hỏi</div>
+        <div class="stage-opts">
+          <div class="stage-opt"><b>A</b><span id="stA"></span></div>
+          <div class="stage-opt"><b>B</b><span id="stB"></span></div>
+          <div class="stage-opt"><b>C</b><span id="stC"></span></div>
+          <div class="stage-opt"><b>D</b><span id="stD"></span></div>
+        </div>
+      </div>
+
+      <div id="stageFinished" class="hidden">
+        <div style="font-size:68px;margin-bottom:12px">🏆</div>
+        <h1 style="font-size:40px">CHÚC MỪNG CÁC THÍ SINH XUẤT SẮC!</h1>
+        <p style="font-size:20px;opacity:0.85;margin-top:10px">Cuộc thi đã khép lại thành công tốt đẹp.</p>
+        <a href="results.html" class="action-btn primary-btn" style="text-decoration:none;margin-top:20px;font-size:18px;padding:14px 28px">XEM BẢNG VINH DANH</a>
+      </div>
+    </div>
+  </div>
+  <script src="config.js"></script>
+  <script src="screen.js"></script>
+</body>
+</html>
