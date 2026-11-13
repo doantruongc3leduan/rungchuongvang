@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eef6ff">
+  <title>Admin Pro | Rung Chuông Vàng</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+  <div class="admin-glow glow-a"></div>
+  <div class="admin-glow glow-b"></div>
+  <header class="admin-top">
+    <a class="brand" href="index.html">
+      <span class="brand-logo">🔔</span>
+      <span><b>RUNG CHUÔNG VÀNG <span class="pro-tag">PRO</span></b><small>THPT LÊ DUẨN · TRUNG TÂM ĐIỀU HÀNH</small></span>
+    </a>
+    <div class="top-right">
+      <a href="screen.html" target="_blank" class="action-btn outline-btn" style="padding:8px 12px;text-decoration:none">📺 MÀN HÌNH CHIẾU</a>
+      <a href="results.html" target="_blank" class="action-btn outline-btn" style="padding:8px 12px;text-decoration:none">🏆 XẾP HẠNG</a>
+      <span id="connection" class="connection"><i></i> Chưa kết nối</span>
+      <span class="admin-chip">ADMIN PRO</span>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <section id="loginPanel" class="login-panel surface">
+      <div class="login-emblem">🛡️</div>
+      <p class="kicker">QUẢN TRỊ HỆ THỐNG PRO</p>
+      <h1>Trung tâm điều khiển</h1>
+      <p class="sub">Đăng nhập để giám sát, quản lý ngân hàng câu hỏi và điều hành cuộc thi trực tiếp.</p>
+      <div class="login-grid">
+        <label>Tài khoản<input id="adminUser" autocomplete="username" placeholder="Tên đăng nhập"></label>
+        <label>Mật khẩu<input id="adminPass" type="password" autocomplete="current-password" placeholder="Mật khẩu quản trị"></label>
+        <button class="action-btn primary-btn wide" id="loginAdmin">ĐĂNG NHẬP HỆ THỐNG <span>→</span></button>
+      </div>
+      <div id="adminMsg" class="notice" role="status"></div>
+    </section>
+
+    <div id="controls" class="hidden">
+      <section class="welcome-row">
+        <div>
+          <p class="kicker">LIVE CONTROL ROOM PRO</p>
+          <h1>Bảng điều hành cuộc thi</h1>
+          <p class="sub">Duyệt thí sinh đồng loạt, cứu trợ, quản lý ngân hàng câu hỏi và theo dõi thời gian thực.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button id="btnOpenQBank" class="action-btn outline-btn">📚 NGÂN HÀNG CÂU HỎI</button>
+          <div class="live-pill"><i></i><span id="statusText">ĐANG CHỜ</span></div>
+        </div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="metric-card"><span class="metric-icon blue">👥</span><div><small>TỔNG ĐĂNG KÝ</small><strong id="mTotal">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon green">✓</span><div><small>ĐANG THI / ĐÃ DUYỆT</small><strong id="mActive">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon amber">⌛</span><div><small>CHỜ DUYỆT</small><strong id="mPending">0</strong></div></article>
+        <article class="metric-card"><span class="metric-icon red">✕</span><div><small>ĐÃ BỊ LOẠI</small><strong id="mEliminated">0</strong></div></article>
+      </section>
+
+      <section class="control-grid">
+        <article class="panel control-panel">
+          <div class="panel-head">
+            <div><p class="kicker">GAME MASTER</p><h2>Điều khiển cuộc thi</h2></div>
+            <span class="panel-icon">🎮</span>
+          </div>
+          <div class="main-actions">
+            <button id="start" class="action-btn primary-btn">▶ BẮT ĐẦU THI</button>
+            <button id="next" class="action-btn soft-btn">⏭ CÂU TIẾP THEO</button>
+            <button id="pause" class="action-btn soft-btn">Ⅱ TẠM DỪNG</button>
+            <button id="resume" class="action-btn soft-btn">▶ TIẾP TỤC</button>
+            <button id="finish" class="action-btn danger-btn">■ KẾT THÚC</button>
+            <button id="resetGame" class="action-btn outline-btn" style="border-color:#f3b5be;color:#c93b52">↺ TẠO PHIÊN MỚI (RESET)</button>
+          </div>
+          <div class="settings-grid">
+            <label>Số câu thi<input id="totalQ" type="number" min="1" max="100" value="20"></label>
+            <label>Thời gian / câu (s)<input id="seconds" type="number" min="5" max="120" value="10"></label>
+            <label>Thư viện lọc<input id="pool" type="number" min="1" max="500" value="100"></label>
+            <button id="saveSettings" class="action-btn outline-btn">LƯU CẤU HÌNH</button>
+          </div>
+          <p class="hint">Mẹo: Bấm "Duyệt tất cả" bên dưới để đưa toàn bộ thí sinh chờ duyệt vào thi nhanh chóng trước khi bấm Bắt đầu.</p>
+        </article>
+
+        <article class="panel current-panel">
+          <div class="panel-head">
+            <div><p class="kicker">ON AIR</p><h2>Câu hỏi đang thi</h2></div>
+            <span class="question-badge" id="questionBadge">CÂU 0</span>
+          </div>
+          <div class="question-preview">
+            <div class="question-meta"><span id="qProgress">Chưa bắt đầu</span><strong id="qTimer">--</strong></div>
+            <h3 id="currentQuestion">Câu hỏi sẽ hiển thị tại đây khi MC bắt đầu.</h3>
+            <div id="currentOptions" class="admin-options">
+              <div>A · —</div><div>B · —</div><div>C · —</div><div>D · —</div>
+            </div>
+            <div class="answer-key">ĐÁP ÁN ĐÚNG <b id="correctAnswer">—</b><span id="answeredCount">0 lượt trả lời</span></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- QUẢN LÝ THÍ SINH VỚI TÍNH NĂNG DUYỆT ĐỒNG LOẠT & CỨU TRỢ -->
+      <section class="panel roster-panel">
+        <div class="panel-head roster-heading">
+          <div>
+            <p class="kicker">THÍ SINH TRỰC TIẾP</p>
+            <h2>Quản lý, Duyệt đồng loạt & Cứu trợ</h2>
+            <p class="sub">Hỗ trợ duyệt nhanh tất cả thí sinh đang chờ hoặc kích hoạt cứu trợ khôi phục toàn bộ thí sinh bị loại.</p>
+          </div>
+          <div class="bulk-actions" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button id="btnApproveAll" class="action-btn primary-btn" style="background:linear-gradient(110deg,#10b981,#059669)">✓ DUYỆT TẤT CẢ (<span id="btnApproveAllCount">0</span>)</button>
+            <button id="btnRescueAll" class="action-btn soft-btn" style="color:#b45309;background:#fffbeb;border-color:#fde68a">🛟 CỨU TRỢ TẤT CẢ (<span id="btnRescueAllCount">0</span>)</button>
+            <button id="btnExportCsv" class="action-btn outline-btn">📥 XUẤT EXCEL/CSV</button>
+            <button id="refreshNow" class="action-btn outline-btn">↻ LÀM MỚI</button>
+          </div>
+        </div>
+
+        <div class="roster-tools">
+          <input id="studentSearch" placeholder="Tìm theo họ tên, lớp hoặc mã thí sinh...">
+          <div id="filterTabs" class="filter-tabs">
+            <button class="active" data-filter="ALL">Tất cả <b id="fAll">0</b></button>
+            <button data-filter="READY">Chờ duyệt <b id="fReady">0</b></button>
+            <button data-filter="APPROVED">Đã duyệt <b id="fApproved">0</b></button>
+            <button data-filter="ACTIVE">Đang thi <b id="fActive">0</b></button>
+            <button data-filter="ELIMINATED">Bị loại <b id="fElim">0</b></button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>THÍ SINH</th>
+                <th>MÃ / THỜI ĐIỂM</th>
+                <th>TRẠNG THÁI</th>
+                <th>LÝ DO / SỰ KIỆN</th>
+                <th>THAO TÁC</th>
+              </tr>
+            </thead>
+            <tbody id="studentRows">
+              <tr><td colspan="5" class="empty-row">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot">
+          <span id="rosterCount">0 thí sinh</span>
+          <span>Cập nhật tự động mỗi 2.5 giây</span>
+        </div>
+      </section>
+
+      <!-- NHẬT KÝ HOẠT ĐỘNG -->
+      <section class="panel event-panel">
+        <div class="panel-head">
+          <div><p class="kicker">ACTIVITY STREAM</p><h2>Nhật ký trả lời và sự kiện</h2></div>
+          <span class="event-live">● LIVE</span>
+        </div>
+        <div class="table-wrap">
+          <table class="event-table">
+            <thead>
+              <tr>
+                <th>THỜI GIAN</th>
+                <th>MÃ THÍ SINH</th>
+                <th>SỰ KIỆN</th>
+                <th>CHI TIẾT</th>
+                <th>TRẠNG THÁI</th>
+              </tr>
+            </thead>
+            <tbody id="eventRows">
+              <tr><td colspan="5" class="empty-row">Chưa có sự kiện.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL NGÂN HÀNG CÂU HỎI PRO -->
+  <div id="qBankModal" class="modal-backdrop hidden">
+    <div class="modal-box surface">
+      <div class="panel-head">
+        <div><p class="kicker">QUESTION BANK MANAGER</p><h2>Quản lý Ngân hàng câu hỏi</h2></div>
+        <button id="btnCloseQBank" class="action-btn outline-btn">✕ ĐÓNG</button>
+      </div>
+      
+      <form id="qForm" class="q-form">
+        <input type="hidden" id="qId">
+        <div class="q-form-row">
+          <label style="flex:3">Nội dung câu hỏi<input id="qText" required placeholder="Nhập nội dung câu hỏi..."></label>
+          <label style="flex:1">Đáp án đúng
+            <select id="qCorrect">
+              <option value="A">Đáp án A</option>
+              <option value="B">Đáp án B</option>
+              <option value="C">Đáp án C</option>
+              <option value="D">Đáp án D</option>
+            </select>
+          </label>
+        </div>
+        <div class="q-form-grid">
+          <label>Đáp án A<input id="qA" required placeholder="Phương án A"></label>
+          <label>Đáp án B<input id="qB" required placeholder="Phương án B"></label>
+          <label>Đáp án C<input id="qC" required placeholder="Phương án C"></label>
+          <label>Đáp án D<input id="qD" required placeholder="Phương án D"></label>
+        </div>
+        <div class="q-form-row" style="align-items:flex-end">
+          <label>Chủ đề<input id="qTopic" placeholder="VD: Lịch sử, Tin học..."></label>
+          <label>Độ khó<input id="qDiff" placeholder="VD: Dễ, Trung bình, Khó"></label>
+          <label>Trạng thái
+            <select id="qActive">
+              <option value="true">Sử dụng (Hoạt động)</option>
+              <option value="false">Tạm ẩn</option>
+            </select>
+          </label>
+          <div style="display:flex;gap:8px">
+            <button type="submit" class="action-btn primary-btn">💾 LƯU CÂU HỎI</button>
+            <button type="button" id="btnResetQForm" class="action-btn soft-btn">MỚI</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-wrap" style="max-height:340px;margin-top:16px">
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th>MÃ</th>
+              <th>NỘI DUNG CÂU HỎI</th>
+              <th>ĐÁP ÁN</th>
+              <th>CHỦ ĐỀ / ĐỘ KHÓ</th>
+              <th>THAO TÁC</th>
+            </tr>
+          </thead>
+          <tbody id="qBankRows">
+            <tr><td colspan="5" class="empty-row">Đang tải ngân hàng câu hỏi...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="admin-toast"></div>
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
